@@ -6,7 +6,7 @@ def leerBase():
 	Funcion que leer una base de conocimiento y la transforma en un arreglo de filas
 	'''
 	datos = []
-	archivo = open('nombre archivo.txt', 'r')  # Reemplaza 'nombre_archivo.txt' con la ruta y nombre de tu archivo
+	archivo = open('Recetas.csv', 'r') 
 	try:
 		next(archivo)
 		for linea in archivo:
@@ -21,7 +21,7 @@ def cabeceras():
 	'''
 	Funcion que regresa la primera columna de un archivo de conocimiento.
 	'''
-	archivo = open('nombre archivo.txt', 'r')  # Reemplaza 'nombre_archivo.txt' con la ruta y nombre de tu archivo
+	archivo = open('Recetas.txt', 'r')
 	try:
 		aux = archivo.readline().rstrip('\n').split(',')
 		aux = aux[1:]
@@ -54,8 +54,22 @@ def matchUserInput(preferencia, c):
 	return pref
 
 def matchPreference(preferencia, conocimiento):
-	recomendado = ""
 	'''
 	Calcular el angulo minimo entre el input, y la base de conocimiento
 	'''
+	indice_recomendacion = 0
+	tmp = 100
+
+	for indice,line in enumerate(conocimiento):
+		distancia = np.linalg.norm(np.array(line[1::],dtype=int) - preferencia)
+		print(line[0] + ': ' + str(distancia))
+		if distancia <= tmp:
+			tmp = distancia
+			indice_recomendacion = indice
+	
+	recomendado = conocimiento[indice_recomendacion][0]
 	return recomendado
+
+#vector_usuario = np.array([0,0,0,0,0,0,0,1,0,0,0,1,0,0,1,1,0,0,1,1,1,0,0,0,0])
+# conocimiento = leerBase()
+# print('Te recomendamos: ' + matchPreference(vector_usuario, conocimiento))
