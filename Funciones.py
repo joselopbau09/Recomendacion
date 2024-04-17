@@ -20,7 +20,7 @@ def cabeceras():
 	'''
 	Funcion que regresa la primera columna de un archivo de conocimiento.
 	'''
-	archivo = open('Recetas.txt', 'r')
+	archivo = open('Recetas.csv', 'r')
 	try:
 		aux = archivo.readline().rstrip('\n').split(',')
 		aux = aux[1:]
