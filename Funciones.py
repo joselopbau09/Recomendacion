@@ -1,4 +1,5 @@
 import re, random
+import numpy as np
 
 def leerBase():
 	'''
@@ -26,7 +27,6 @@ def cabeceras():
 		aux = aux[1:]
 	finally:
 		archivo.close()
-	#print(aux)
 	return aux
 
 def crearMensaje(opciones, inicio, fin):
@@ -117,7 +117,7 @@ def matchPreference(preferencia, conocimiento):
 
 	for indice,line in enumerate(conocimiento):
 		distancia = np.linalg.norm(np.array(line[1::],dtype=int) - preferencia)
-		print(line[0] + ': ' + str(distancia))
+		#print(line[0] + ': ' + str(distancia))
 		if distancia <= tmp:
 			tmp = distancia
 			indice_recomendacion = indice
@@ -127,7 +127,9 @@ def matchPreference(preferencia, conocimiento):
 
 def main():
 	vector = crearVectorUsuario()
-	print(vector)
+	base = leerBase()
+	recomendacion = matchPreference(vector, base)
+	print('Te receomendamos la receta: ' + recomendacion + '.\n')
 	
 
 if __name__ == "__main__":
