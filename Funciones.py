@@ -1,5 +1,5 @@
-import re, random
 import numpy as np
+import math
 
 def leerBase():
 	'''
@@ -86,13 +86,58 @@ def crearVectorUsuario():
 	return vectorUsuario
 
 def obtenerDF(conocimiento):
-	return 0
+	'''
+	Suma los valores de cada atributo de la base de conocimiento
+	'''
+	columnas = []
+	for columna in range(len(conocimiento[0]) - 1):
+		suma = 0
+		for renglon in conocimiento:
+			suma += renglon[columna]
+		columnas.append(suma)
+	return columnas
 
 def obtenerIDF(df,conocimiento):
 	return 0
 
-def normalizar(conocimiento, total):
-	return conocimiento
+def totalAtributos(conocimiento):
+	'''
+	Suma los atributos presentes en cada receta y lo agrega al final de la lista
+	'''
+	conocimientoTotal = []
+	for line in conocimiento:
+		atributos = [int(atributo) for atributo in line[1:]]
+		atributos.append(sum(atributos))
+		conocimientoTotal.append(atributos)
+	return conocimientoTotal
+
+def normaliza(renglon, total):
+	'''
+	Normaliza los valores de un renglon de la base de conocimiento.
+	'''
+	raiz = math.sqrt(total)
+	return [valor / raiz for valor in renglon]
+
+def normalizar(conocimiento):
+	'''
+	Normaliza todos los renglones de la base de conocimiento.
+	'''
+	normalizado = []
+	[normalizado.append(normaliza(linea[:-1], linea[-1])) for linea in conocimiento]
+	return normalizado
+
+def columnas(conocimiento):
+	'''
+	Regresa las columnas de la base de conocimiento.
+	'''
+	columnas = []
+	for columna in range(len(conocimiento[0]) - 1):
+		columnas.append([renglon[columna] for renglon in conocimiento])
+	return columnas
+
+def productoPunto(vectorUsuario, columnas):
+	return [np.dot(vectorUsuario, columna) for columna in columnas]
+	
 
 def matchUserInput(preferencia, c):
 	pref = []
@@ -126,10 +171,30 @@ def matchPreference(preferencia, conocimiento):
 	return recomendado
 
 def main():
-	vector = crearVectorUsuario()
-	base = leerBase()
-	recomendacion = matchPreference(vector, base)
-	print('Te receomendamos la receta: ' + recomendacion + '.\n')
+	datos = leerBase()
+	print(datos)
+
+	# print('--------------------------------------------')
+
+	# datosInt = totalAtributos(datos)
+	# print(datosInt)	
+
+	# print('--------------------------------------------')
+
+	# normalizado = normalizar(datosInt)
+	# print(normalizado)
+
+	# print('--------------------------------------------')
+
+	# print(obtenerDF(datosInt))
+
+	# print('--------------------------------------------')
+	
+	# print(columnas(datosInt))
+
+	# print('--------------------------------------------')
+	# vectorUsuario = [0, 1, 0, -1, 0, 0, 1, -1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1, -1]
+	# print(productoPunto(vectorUsuario, columnas(datosInt)))
 	
 
 if __name__ == "__main__":
