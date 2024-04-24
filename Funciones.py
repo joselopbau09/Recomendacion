@@ -1,5 +1,6 @@
 import csv
 import math
+import numpy as np
 
 def leerBase():
 	'''
@@ -119,7 +120,7 @@ def obtenerDF(conocimiento):
 	return columnas
 
 def obtenerIDF(df,conocimiento):
-	return 0
+	return math.log(len(conocimiento)/df)
 
 def totalAtributos(conocimiento):
 	'''
@@ -195,7 +196,6 @@ def main():
 	datos = leerBase()
 	obtenerRecetas()
 
-	print(vectorPreferencia())
 	# print('--------------------------------------------')
 
 	# datosInt = totalAtributos(datos)
