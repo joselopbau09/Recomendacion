@@ -1,4 +1,4 @@
-import numpy as np
+import csv
 import math
 
 def leerBase():
@@ -28,6 +28,15 @@ def cabeceras():
 	finally:
 		archivo.close()
 	return aux
+
+def obtenerRecetas():
+	recetas = []
+	with open('Recetas.csv', newline='') as recetasCsv:
+		filas = csv.reader(recetasCsv)
+		for fila in filas:
+			recetas.append(fila[0])
+	recetas.pop(0)
+	return recetas
 
 def crearMensaje(opciones, inicio, fin):
 	mensaje = 'Cual de las siguientes opciones prefieres: \n'
@@ -84,6 +93,18 @@ def crearVectorUsuario():
 		except ValueError:
 			print('Ingresa un número entero')
 	return vectorUsuario
+
+def vectorPreferencia():
+	vectorPreferencia = []
+	recetas = obtenerRecetas()
+	for receta in recetas:
+		try:
+			mensaje = f'Que tanto prefieres la siguiente receta: {receta}\n 1:Me gusta\n 0:Me es indiferente\n -1:No me gusta\n'
+			vectorPreferencia.append(validarOpcion(mensaje, -1, 1))
+		except ValueError:
+			print('Ingresa un número entero')
+
+	return vectorPreferencia
 
 def obtenerDF(conocimiento):
 	'''
@@ -172,8 +193,9 @@ def matchPreference(preferencia, conocimiento):
 
 def main():
 	datos = leerBase()
-	print(datos)
+	obtenerRecetas()
 
+	print(vectorPreferencia())
 	# print('--------------------------------------------')
 
 	# datosInt = totalAtributos(datos)
