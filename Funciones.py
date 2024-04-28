@@ -139,7 +139,7 @@ def preferenciasUsuario(recetas):
 
 def prediccion(filaNormalizada, perfilUsuario, idf):
 	'''
-	Genera la prediccion de una receta que le puede gustar al usuario
+	Genera las predicciones de las recetas
 	'''
 	primerProducto = np.dot(filaNormalizada, perfilUsuario)
 	segundoProducto = np.dot(primerProducto, idf)
