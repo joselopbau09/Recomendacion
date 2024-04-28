@@ -119,8 +119,8 @@ def obtenerDF(conocimiento):
 		columnas.append(suma)
 	return columnas
 
-def obtenerIDF(df,conocimiento):
-	return math.log(len(conocimiento)/df)
+def obtenerIDF(df,longitud):
+	return [math.log(longitud/item) for item in df]
 
 def totalAtributos(conocimiento):
 	'''
@@ -157,8 +157,8 @@ def columnas(conocimiento):
 		columnas.append([renglon[columna] for renglon in conocimiento])
 	return columnas
 
-def productoPunto(vectorUsuario, columnas):
-	return [np.dot(vectorUsuario, columna) for columna in columnas]
+def perfilUsuario(vectorUsuario, columnas):
+	return [np.dot(columna, vectorUsuario) for columna in columnas]
 	
 
 def matchUserInput(preferencia, c):
@@ -175,49 +175,41 @@ def matchUserInput(preferencia, c):
 			pref.append(0)
 	return pref
 
-def matchPreference(preferencia, conocimiento):
-	'''
-	Calcular el angulo minimo entre el input, y la base de conocimiento
-	'''
-	indice_recomendacion = 0
-	tmp = 100
-
-	for indice,line in enumerate(conocimiento):
-		distancia = np.linalg.norm(np.array(line[1::],dtype=int) - preferencia)
-		#print(line[0] + ': ' + str(distancia))
-		if distancia <= tmp:
-			tmp = distancia
-			indice_recomendacion = indice
-	
-	recomendado = conocimiento[indice_recomendacion][0]
-	return recomendado
+def prediccion(filaNormalizada, perfilUsuario, idf):
+	primerProducto = np.dot(filaNormalizada, perfilUsuario)
+	segundoProducto = np.dot(primerProducto, idf)
+	return sum(segundoProducto)
 
 def main():
 	datos = leerBase()
-	obtenerRecetas()
+	recetas = obtenerRecetas()
 
-	# print('--------------------------------------------')
+	print('--------------------- Atributos-------------------------')
+	datosInt = totalAtributos(datos)
+	#print(datosInt)	
 
-	# datosInt = totalAtributos(datos)
-	# print(datosInt)	
+	print('--------------------- Base normalizada ------------------------')
+	normalizado = normalizar(datosInt)
+	#print(normalizado)
 
-	# print('--------------------------------------------')
+	print('--------------------- Suma de las columnas (DF) -----------------------')
+	df = (obtenerDF(datosInt))
+	#print(df)
 
-	# normalizado = normalizar(datosInt)
-	# print(normalizado)
+	print('--------------------- IDF -----------------------')
+	longitud = len(normalizado)
+	idf = obtenerIDF(df, longitud)
+	#print(idf)
 
-	# print('--------------------------------------------')
+	print('--------------------- Perfil Usuario -------------------------')
+	vectorUsuario = [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0]
+	perfil = perfilUsuario(vectorUsuario, columnas(datosInt))
+	print(perfil)
 
-	# print(obtenerDF(datosInt))
-
-	# print('--------------------------------------------')
-	
-	# print(columnas(datosInt))
-
-	# print('--------------------------------------------')
-	# vectorUsuario = [0, 1, 0, -1, 0, 0, 1, -1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1, -1]
-	# print(productoPunto(vectorUsuario, columnas(datosInt)))
-	
-
+	print('--------------------- Predicciones -----------------------')
+	predicciones = []
+	for fila in normalizado:
+		predicciones.append(prediccion(fila, perfil, idf))
+	print('Te recomendamos : ' + recetas[np.argmax(predicciones)])
 if __name__ == "__main__":
     main()
