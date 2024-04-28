@@ -148,31 +148,13 @@ def prediccion(filaNormalizada, perfilUsuario, idf):
 def main():
 	datos = leerBase()
 	recetas = obtenerRecetas()
-	print(datos)
-
-	print('--------------------- Atributos-------------------------')
 	datosInt = totalAtributos(datos)
-	#print(datosInt)	
-
-	print('--------------------- Base normalizada ------------------------')
 	normalizado = normalizar(datosInt)
-	#print(normalizado)
-
-	print('--------------------- Suma de las columnas (DF) -----------------------')
 	df = (obtenerDF(datosInt))
-	#print(df)
-
-	print('--------------------- IDF -----------------------')
 	longitud = len(normalizado)
 	idf = obtenerIDF(df, longitud)
-	#print(idf)
-
-	print('--------------------- Perfil Usuario -------------------------')
 	vectorUsuario = preferenciasUsuario(recetas)
 	perfil = perfilUsuario(vectorUsuario, columnas(datosInt))
-	print(perfil)
-
-	print('--------------------- Predicciones -----------------------')
 	predicciones = []
 	for fila in normalizado:
 		predicciones.append(prediccion(fila, perfil, idf))
