@@ -1,6 +1,7 @@
 import csv
 import math
 import numpy as np
+import random
 
 def leerBase():
 	'''
@@ -18,17 +19,6 @@ def leerBase():
 		archivo.close()
 	return datos
 
-def cabeceras():
-	'''
-	Funcion que regresa la primera columna de un archivo de conocimiento.
-	'''
-	archivo = open('Recetas.csv', 'r')
-	try:
-		aux = archivo.readline().rstrip('\n').split(',')
-		aux = aux[1:]
-	finally:
-		archivo.close()
-	return aux
 
 def obtenerRecetas():
 	recetas = []
@@ -61,51 +51,7 @@ def validarOpcion(mensaje, minimo, maximo):
 		except ValueError:
 			print('Ingresa un número entero.')
 
-def crearVectorUsuario():
-	cabecera = cabeceras()
 
-	proteinasReceta = crearMensaje( cabecera[:6], 0, 6 )
-	metodosCoccion = crearMensaje( cabecera[6:9], 6, 9 )
-	tiposReceta = crearMensaje( cabecera[9:12], 9, 12 )
-	utensilios =  crearMensaje( cabecera[12:17], 12, 17 )
-	complemento = crearMensaje( cabecera [17:], 17, 24 )
-	
-	vectorUsuario = [0] * (len(cabecera))
-
-	validacion = 0
-	while (validacion < 5):
-		try:
-			if validacion == 0:
-				opcionEleguida = validarOpcion(proteinasReceta, 0, 6)
-				vectorUsuario[opcionEleguida] = 1
-			if validacion == 1:
-				opcionEleguida = validarOpcion(metodosCoccion, 6, 9)
-				vectorUsuario[opcionEleguida] = 1
-			if validacion == 2:
-				opcionEleguida = validarOpcion(tiposReceta, 9, 12)
-				vectorUsuario[opcionEleguida] = 1
-			if validacion == 3:
-				opcionEleguida = validarOpcion(utensilios, 12, 17)
-				vectorUsuario[opcionEleguida] = 1
-			if validacion == 4:
-				opcionEleguida = validarOpcion(complemento, 17, 24)
-				vectorUsuario[opcionEleguida] = 1
-			validacion+=1
-		except ValueError:
-			print('Ingresa un número entero')
-	return vectorUsuario
-
-def vectorPreferencia():
-	vectorPreferencia = []
-	recetas = obtenerRecetas()
-	for receta in recetas:
-		try:
-			mensaje = f'Que tanto prefieres la siguiente receta: {receta}\n 1:Me gusta\n 0:Me es indiferente\n -1:No me gusta\n'
-			vectorPreferencia.append(validarOpcion(mensaje, -1, 1))
-		except ValueError:
-			print('Ingresa un número entero')
-
-	return vectorPreferencia
 
 def obtenerDF(conocimiento):
 	'''
@@ -148,6 +94,17 @@ def normalizar(conocimiento):
 	[normalizado.append(normaliza(linea[:-1], linea[-1])) for linea in conocimiento]
 	return normalizado
 
+
+
+def preferenciasUsuario(recetas):
+    preferencias = np.zeros(len(recetas))
+    indices = random.sample(range(len(recetas)), 10)
+    for indice in indices:
+        receta = recetas[indice]
+        preferencia = input(f"¿Te gusta la receta {receta}? Responde con 1 si te gusta, -1 si no te gusta, 0 si no te importa: ")
+        preferencias[indice] = int(preferencia)
+    return preferencias
+
 def columnas(conocimiento):
 	'''
 	Regresa las columnas de la base de conocimiento.
@@ -158,24 +115,32 @@ def columnas(conocimiento):
 	return columnas
 
 def perfilUsuario(vectorUsuario, columnas):
+	'''
+	Genera el perfil del usuario.
+	'''
 	return [np.dot(columna, vectorUsuario) for columna in columnas]
-	
 
-def matchUserInput(preferencia, c):
-	pref = []
-	for text in c:
-		found = False
-		for r in preferencia:
-			if r.strip().lower() == text.strip().lower():
-				#print("MATCH:", r)
-				pref.append(1)
-				found = True
-				break
-		if not found:
-			pref.append(0)
-	return pref
+
+def preferenciasUsuario(recetas):
+	'''
+	Pregunta la opinión de 10 recetas aleatorias al usuario
+	Se puede modificar la cantidad de recetas a preguntar
+	'''
+	preferencias = np.zeros(len(recetas))
+	indices = random.sample(range(len(recetas)), 10)
+	for indice in indices:
+		receta = recetas[indice]
+		preferencia = input(f"¿Te gusta la receta {receta}? Responde con 1 si te gusta, -1 si no te gusta, 0 si no te importa: ")
+		while preferencia not in ['1', '-1', '0']:
+			print("Respuesta inválida. Por favor, responde con 1, -1 o 0.")
+			preferencia = input(f"¿Te gusta la receta {receta}? Responde con 1 si te gusta, -1 si no te gusta, 0 si no te importa: ")
+		preferencias[indice] = int(preferencia)
+	return preferencias
 
 def prediccion(filaNormalizada, perfilUsuario, idf):
+	'''
+	Genera la prediccion de una receta que le puede gustar al usuario
+	'''
 	primerProducto = np.dot(filaNormalizada, perfilUsuario)
 	segundoProducto = np.dot(primerProducto, idf)
 	return sum(segundoProducto)
@@ -183,6 +148,7 @@ def prediccion(filaNormalizada, perfilUsuario, idf):
 def main():
 	datos = leerBase()
 	recetas = obtenerRecetas()
+	print(datos)
 
 	print('--------------------- Atributos-------------------------')
 	datosInt = totalAtributos(datos)
@@ -202,7 +168,7 @@ def main():
 	#print(idf)
 
 	print('--------------------- Perfil Usuario -------------------------')
-	vectorUsuario = [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0]
+	vectorUsuario = preferenciasUsuario(recetas)
 	perfil = perfilUsuario(vectorUsuario, columnas(datosInt))
 	print(perfil)
 
